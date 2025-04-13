@@ -8,14 +8,23 @@ import { Slider } from '@/components/ui/slider';
 import { ROICalculation } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 import {
-  Chart,
+  ChartContainer as Chart,
+  ChartTooltip,
   ChartLegend,
-  ChartLegendItem,
-  ChartArea,
-  ChartPie,
-  ChartDonut,
-  ChartBar
+  ChartTooltipContent,
 } from '@/components/ui/chart';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
 
 export const ROICalculator = () => {
   const [calculationData, setCalculationData] = useState<Omit<ROICalculation, 'results'>>({
@@ -429,86 +438,102 @@ export const ROICalculator = () => {
               <div className="mt-6">
                 <h3 className="font-medium mb-4">Monthly Cash Flow Breakdown</h3>
                 <div className="h-60">
-                  <Chart type="bar">
-                    <ChartBar
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
                       data={[
                         {
                           name: 'Rental Income',
                           value: calculationData.rentalIncome,
+                          fill: '#10b981' // green-500
                         },
                         {
                           name: 'Expenses',
                           value: -totalExpenses,
+                          fill: '#f59e0b' // amber-500
                         },
                         {
                           name: 'Mortgage',
                           value: -monthlyMortgagePayment,
+                          fill: '#ef4444' // red-500
                         },
                         {
                           name: 'Cash Flow',
                           value: results.monthlyCashFlow,
+                          fill: results.monthlyCashFlow >= 0 ? '#10b981' : '#f43f5e' // green-500 or rose-500
                         },
                       ]}
-                      valueFormatter={(value) => `$${Math.abs(value).toLocaleString()}`}
-                      color={{
-                        'Rental Income': 'green',
-                        'Expenses': 'amber',
-                        'Mortgage': 'red',
-                        'Cash Flow': results.monthlyCashFlow >= 0 ? 'emerald' : 'rose',
-                      }}
-                    />
-                  </Chart>
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip 
+                        formatter={(value: number) => `$${Math.abs(value).toLocaleString()}`}
+                      />
+                      <Legend />
+                      <Bar dataKey="value" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
               
               <div className="mt-6">
                 <h3 className="font-medium mb-4">Expense Breakdown</h3>
                 <div className="h-60 flex items-center justify-center">
-                  <Chart type="donut" className="h-full">
-                    <ChartDonut
-                      data={[
-                        {
-                          name: 'Mortgage',
-                          value: monthlyMortgagePayment,
-                        },
-                        {
-                          name: 'Property Tax',
-                          value: calculationData.expenses.propertyTax,
-                        },
-                        {
-                          name: 'Insurance',
-                          value: calculationData.expenses.insurance,
-                        },
-                        {
-                          name: 'Maintenance',
-                          value: calculationData.expenses.maintenance,
-                        },
-                        {
-                          name: 'Property Mgmt',
-                          value: calculationData.expenses.propertyManagement,
-                        },
-                        {
-                          name: 'Utilities',
-                          value: calculationData.expenses.utilities,
-                        },
-                        {
-                          name: 'Other',
-                          value: calculationData.expenses.other,
-                        },
-                      ]}
-                      valueFormatter={(value) => `$${value.toLocaleString()}`}
-                      color={{
-                        'Mortgage': 'blue',
-                        'Property Tax': 'amber',
-                        'Insurance': 'green',
-                        'Maintenance': 'red',
-                        'Property Mgmt': 'purple',
-                        'Utilities': 'sky',
-                        'Other': 'gray',
-                      }}
-                    />
-                    <ChartLegend className="justify-center" />
-                  </Chart>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          {
+                            name: 'Mortgage',
+                            value: monthlyMortgagePayment,
+                            fill: '#3b82f6' // blue-500
+                          },
+                          {
+                            name: 'Property Tax',
+                            value: calculationData.expenses.propertyTax,
+                            fill: '#f59e0b' // amber-500
+                          },
+                          {
+                            name: 'Insurance',
+                            value: calculationData.expenses.insurance,
+                            fill: '#10b981' // green-500
+                          },
+                          {
+                            name: 'Maintenance',
+                            value: calculationData.expenses.maintenance,
+                            fill: '#ef4444' // red-500
+                          },
+                          {
+                            name: 'Property Mgmt',
+                            value: calculationData.expenses.propertyManagement,
+                            fill: '#8b5cf6' // purple-500
+                          },
+                          {
+                            name: 'Utilities',
+                            value: calculationData.expenses.utilities,
+                            fill: '#0ea5e9' // sky-500
+                          },
+                          {
+                            name: 'Other',
+                            value: calculationData.expenses.other,
+                            fill: '#6b7280' // gray-500
+                          },
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        innerRadius={40}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                      />
+                      <Tooltip 
+                        formatter={(value: number) => `$${value.toLocaleString()}`} 
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
             </TabsContent>
