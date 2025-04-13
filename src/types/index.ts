@@ -1,4 +1,3 @@
-
 // User related types
 export type UserRole = 'buyer' | 'seller' | 'guest';
 
@@ -26,7 +25,7 @@ export interface Property {
   sellerName: string;
   createdAt: string;
   status: 'available' | 'pending' | 'sold';
-  propertyType: 'house' | 'apartment' | 'condo' | 'townhouse' | 'land';
+  propertyType: 'house' | 'apartment' | 'land';
 }
 
 // Document related types

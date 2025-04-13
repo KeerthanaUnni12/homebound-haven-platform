@@ -4,14 +4,14 @@ import { Property } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from './AuthContext';
 
-// Mock property data
+// Mock property data with Indian locations
 const mockProperties: Property[] = [
   {
     id: '1',
     title: 'Modern Downtown Apartment',
     description: 'A beautiful modern apartment in the heart of downtown with amazing city views.',
-    price: 350000,
-    location: 'New York, NY',
+    price: 5500000,
+    location: 'Mumbai, Maharashtra',
     bedrooms: 2,
     bathrooms: 2,
     squareFootage: 1200,
@@ -27,8 +27,8 @@ const mockProperties: Property[] = [
     id: '2',
     title: 'Suburban Family Home',
     description: 'Spacious family home in a quiet suburban neighborhood with a large backyard.',
-    price: 550000,
-    location: 'San Francisco, CA',
+    price: 8500000,
+    location: 'Bangalore, Karnataka',
     bedrooms: 4,
     bathrooms: 3,
     squareFootage: 2400,
@@ -44,8 +44,8 @@ const mockProperties: Property[] = [
     id: '3',
     title: 'Luxury Beachfront Villa',
     description: 'Stunning beachfront villa with panoramic ocean views and private access to the beach.',
-    price: 1200000,
-    location: 'Miami, FL',
+    price: 22000000,
+    location: 'Goa, India',
     bedrooms: 5,
     bathrooms: 4,
     squareFootage: 3500,
@@ -61,8 +61,8 @@ const mockProperties: Property[] = [
     id: '4',
     title: 'Urban Loft Apartment',
     description: 'Stylish loft apartment in a converted industrial building with original features.',
-    price: 425000,
-    location: 'Chicago, IL',
+    price: 6250000,
+    location: 'Delhi, India',
     bedrooms: 1,
     bathrooms: 2,
     squareFootage: 1100,

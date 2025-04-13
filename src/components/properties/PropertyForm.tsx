@@ -51,6 +51,13 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
     }));
   };
   
+  const handlePropertyTypeChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      propertyType: value as 'house' | 'apartment' | 'land',
+    }));
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -64,7 +71,6 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
       const propertyData = {
         ...formData,
         features: featuresArray,
-        propertyType: formData.propertyType as any,
       };
       
       if (isEditing && initialData.id) {
@@ -113,9 +119,7 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
               <Select 
                 name="propertyType" 
                 value={formData.propertyType} 
-                onValueChange={(value) => 
-                  setFormData(prev => ({ ...prev, propertyType: value }))
-                }
+                onValueChange={handlePropertyTypeChange}
               >
                 <SelectTrigger id="propertyType">
                   <SelectValue placeholder="Select type" />
@@ -123,8 +127,6 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
                 <SelectContent>
                   <SelectItem value="house">House</SelectItem>
                   <SelectItem value="apartment">Apartment</SelectItem>
-                  <SelectItem value="condo">Condo</SelectItem>
-                  <SelectItem value="townhouse">Townhouse</SelectItem>
                   <SelectItem value="land">Land</SelectItem>
                 </SelectContent>
               </Select>
@@ -144,14 +146,14 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="price">Price ($)</Label>
+              <Label htmlFor="price">Price (₹)</Label>
               <Input
                 id="price"
                 name="price"
                 type="number"
                 value={formData.price}
                 onChange={handleChange}
-                placeholder="300000"
+                placeholder="5000000"
                 min={0}
                 required
               />

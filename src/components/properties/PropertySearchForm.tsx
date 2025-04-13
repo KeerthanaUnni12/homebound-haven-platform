@@ -49,7 +49,7 @@ export const PropertySearchForm = ({ onSearch }: PropertySearchFormProps) => {
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="location"
-                placeholder="City, neighborhood, or ZIP"
+                placeholder="City or neighborhood"
                 className="pl-8"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
@@ -67,8 +67,6 @@ export const PropertySearchForm = ({ onSearch }: PropertySearchFormProps) => {
                 <SelectItem value="all">Any type</SelectItem>
                 <SelectItem value="house">House</SelectItem>
                 <SelectItem value="apartment">Apartment</SelectItem>
-                <SelectItem value="condo">Condo</SelectItem>
-                <SelectItem value="townhouse">Townhouse</SelectItem>
                 <SelectItem value="land">Land</SelectItem>
               </SelectContent>
             </Select>
@@ -99,7 +97,7 @@ export const PropertySearchForm = ({ onSearch }: PropertySearchFormProps) => {
         {showAdvanced && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
             <div>
-              <Label>Price Range</Label>
+              <Label>Price Range (₹)</Label>
               <div className="flex items-center space-x-2 mt-2">
                 <Input
                   type="number"
