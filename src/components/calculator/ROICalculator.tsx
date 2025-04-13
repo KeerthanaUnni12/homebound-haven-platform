@@ -3,541 +3,139 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
-import { ROICalculation } from '@/types';
+import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
-import {
-  ChartContainer as Chart,
-  ChartTooltip,
-  ChartLegend,
-  ChartTooltipContent,
-} from '@/components/ui/chart';
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
 
 export const ROICalculator = () => {
-  const [calculationData, setCalculationData] = useState<Omit<ROICalculation, 'results'>>({
-    propertyValue: 350000,
-    downPayment: 70000,
-    loanAmount: 280000,
-    interestRate: 4.5,
-    loanTerm: 30,
-    rentalIncome: 2500,
-    expenses: {
-      propertyTax: 300,
-      insurance: 100,
-      maintenance: 200,
-      utilities: 0,
-      propertyManagement: 250,
-      other: 100,
-    }
-  });
-  
-  const [results, setResults] = useState<ROICalculation['results']>({
+  const [propertyValue, setPropertyValue] = useState(350000);
+  const [rentalIncome, setRentalIncome] = useState(2500);
+  const [expenses, setExpenses] = useState(950);
+  const [results, setResults] = useState({
     monthlyCashFlow: 0,
     annualCashFlow: 0,
     cashOnCashReturn: 0,
-    capRate: 0,
-    breakEvenPoint: 0,
+    capRate: 0
   });
 
-  useEffect(() => {
-    // Calculate ROI metrics
-    const totalMonthlyExpenses = Object.values(calculationData.expenses).reduce((a, b) => a + b, 0);
-    const monthlyMortgage = calculateMonthlyMortgage(
-      calculationData.loanAmount,
-      calculationData.interestRate,
-      calculationData.loanTerm
-    );
-    
-    const monthlyCashFlow = calculationData.rentalIncome - totalMonthlyExpenses - monthlyMortgage;
+  const calculateROI = () => {
+    // Calculate basic ROI metrics
+    const downPayment = propertyValue * 0.2; // Assume 20% down payment
+    const monthlyCashFlow = rentalIncome - expenses;
     const annualCashFlow = monthlyCashFlow * 12;
-    const cashOnCashReturn = (annualCashFlow / calculationData.downPayment) * 100;
-    
-    const grossAnnualIncome = calculationData.rentalIncome * 12;
-    const annualExpenses = totalMonthlyExpenses * 12 + monthlyMortgage * 12;
-    const netOperatingIncome = grossAnnualIncome - (totalMonthlyExpenses * 12);
-    const capRate = (netOperatingIncome / calculationData.propertyValue) * 100;
-    
-    // Simplified break-even calculation (months to recover down payment)
-    const breakEvenPoint = monthlyCashFlow > 0 
-      ? calculationData.downPayment / monthlyCashFlow 
-      : 0;
+    const cashOnCashReturn = (annualCashFlow / downPayment) * 100;
+    const netOperatingIncome = (rentalIncome * 12) - (expenses * 12);
+    const capRate = (netOperatingIncome / propertyValue) * 100;
     
     setResults({
       monthlyCashFlow,
       annualCashFlow,
       cashOnCashReturn,
-      capRate,
-      breakEvenPoint,
+      capRate
     });
-  }, [calculationData]);
-
-  const calculateMonthlyMortgage = (loanAmount: number, interestRate: number, loanTerm: number) => {
-    // P * (r * (1+r)^n) / ((1+r)^n - 1)
-    const monthlyRate = interestRate / 100 / 12;
-    const numberOfPayments = loanTerm * 12;
-    const numerator = monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments);
-    const denominator = Math.pow(1 + monthlyRate, numberOfPayments) - 1;
-    
-    return loanAmount * (numerator / denominator);
   };
 
-  const updateExpense = (key: keyof ROICalculation['expenses'], value: number) => {
-    setCalculationData(prev => ({
-      ...prev,
-      expenses: {
-        ...prev.expenses,
-        [key]: value,
-      }
-    }));
-  };
-
-  const handlePropertyValueChange = (value: number) => {
-    // Adjust down payment and loan amount
-    const newDownPayment = value * 0.2; // Assume 20% down payment
-    
-    setCalculationData(prev => ({
-      ...prev,
-      propertyValue: value,
-      downPayment: newDownPayment,
-      loanAmount: value - newDownPayment,
-    }));
-  };
-
-  const handleDownPaymentChange = (value: number) => {
-    setCalculationData(prev => ({
-      ...prev,
-      downPayment: value,
-      loanAmount: prev.propertyValue - value,
-    }));
-  };
-
-  const totalExpenses = Object.values(calculationData.expenses).reduce((a, b) => a + b, 0);
-  const monthlyMortgagePayment = calculateMonthlyMortgage(
-    calculationData.loanAmount, 
-    calculationData.interestRate, 
-    calculationData.loanTerm
-  );
-
-  const handleRentalIncomeChange = (value: number) => {
-    setCalculationData(prev => ({
-      ...prev,
-      rentalIncome: value,
-    }));
-  };
+  // Calculate on initial render and when inputs change
+  useEffect(() => {
+    calculateROI();
+  }, [propertyValue, rentalIncome, expenses]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Return on Investment Calculator</CardTitle>
+          <CardTitle>Simple ROI Calculator</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="property" className="space-y-6">
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="property">Property</TabsTrigger>
-              <TabsTrigger value="income">Income & Expenses</TabsTrigger>
-              <TabsTrigger value="results">Results</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="property" className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between">
-                    <Label htmlFor="propertyValue">Property Value</Label>
-                    <span>{formatCurrency(calculationData.propertyValue)}</span>
-                  </div>
-                  <Slider
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="propertyValue">Property Value</Label>
+                <div className="flex items-center mt-1">
+                  <span className="text-sm mr-2">$</span>
+                  <Input
                     id="propertyValue"
-                    min={100000}
-                    max={2000000}
-                    step={10000}
-                    value={[calculationData.propertyValue]}
-                    onValueChange={([value]) => handlePropertyValueChange(value)}
-                    className="mt-2"
+                    type="number"
+                    min="0"
+                    value={propertyValue}
+                    onChange={(e) => setPropertyValue(Number(e.target.value))}
                   />
-                  <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                    <span>$100k</span>
-                    <span>$2M</span>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <div className="flex justify-between">
-                      <Label htmlFor="downPayment">Down Payment</Label>
-                      <span>{formatCurrency(calculationData.downPayment)}</span>
-                    </div>
-                    <Slider
-                      id="downPayment"
-                      min={0}
-                      max={calculationData.propertyValue}
-                      step={5000}
-                      value={[calculationData.downPayment]}
-                      onValueChange={([value]) => handleDownPaymentChange(value)}
-                      className="mt-2"
-                    />
-                    <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                      <span>0%</span>
-                      <span>100%</span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label>Loan Amount</Label>
-                    <div className="mt-2 p-2 border rounded bg-muted/50">
-                      {formatCurrency(calculationData.loanAmount)}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <div className="flex justify-between">
-                      <Label htmlFor="interestRate">Interest Rate (%)</Label>
-                      <span>{calculationData.interestRate.toFixed(2)}%</span>
-                    </div>
-                    <Slider
-                      id="interestRate"
-                      min={1}
-                      max={10}
-                      step={0.1}
-                      value={[calculationData.interestRate]}
-                      onValueChange={([value]) => 
-                        setCalculationData(prev => ({ ...prev, interestRate: value }))
-                      }
-                      className="mt-2"
-                    />
-                    <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                      <span>1%</span>
-                      <span>10%</span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between">
-                      <Label htmlFor="loanTerm">Loan Term (years)</Label>
-                      <span>{calculationData.loanTerm} years</span>
-                    </div>
-                    <Slider
-                      id="loanTerm"
-                      min={15}
-                      max={30}
-                      step={5}
-                      value={[calculationData.loanTerm]}
-                      onValueChange={([value]) => 
-                        setCalculationData(prev => ({ ...prev, loanTerm: value }))
-                      }
-                      className="mt-2"
-                    />
-                    <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                      <span>15 yrs</span>
-                      <span>30 yrs</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-4 p-4 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium">Monthly Mortgage Payment</p>
-                  <p className="text-2xl font-bold mt-1 text-estate-navy">
-                    {formatCurrency(monthlyMortgagePayment)}
-                  </p>
                 </div>
               </div>
-            </TabsContent>
-            
-            <TabsContent value="income" className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between">
-                    <Label htmlFor="rentalIncome">Monthly Rental Income</Label>
-                    <span>{formatCurrency(calculationData.rentalIncome)}</span>
-                  </div>
-                  <Slider
+              
+              <div>
+                <Label htmlFor="rentalIncome">Monthly Rental Income</Label>
+                <div className="flex items-center mt-1">
+                  <span className="text-sm mr-2">$</span>
+                  <Input
                     id="rentalIncome"
-                    min={500}
-                    max={10000}
-                    step={50}
-                    value={[calculationData.rentalIncome]}
-                    onValueChange={([value]) => handleRentalIncomeChange(value)}
-                    className="mt-2"
+                    type="number"
+                    min="0"
+                    value={rentalIncome}
+                    onChange={(e) => setRentalIncome(Number(e.target.value))}
                   />
-                  <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                    <span>$500</span>
-                    <span>$10,000</span>
-                  </div>
-                </div>
-                
-                <div className="mt-6">
-                  <h3 className="font-medium mb-3">Monthly Expenses</h3>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="propertyTax">Property Tax</Label>
-                        <div className="flex items-center mt-1">
-                          <span className="text-sm mr-2">$</span>
-                          <Input
-                            id="propertyTax"
-                            type="number"
-                            min="0"
-                            value={calculationData.expenses.propertyTax}
-                            onChange={(e) => updateExpense('propertyTax', Number(e.target.value))}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="insurance">Insurance</Label>
-                        <div className="flex items-center mt-1">
-                          <span className="text-sm mr-2">$</span>
-                          <Input
-                            id="insurance"
-                            type="number"
-                            min="0"
-                            value={calculationData.expenses.insurance}
-                            onChange={(e) => updateExpense('insurance', Number(e.target.value))}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="maintenance">Maintenance</Label>
-                        <div className="flex items-center mt-1">
-                          <span className="text-sm mr-2">$</span>
-                          <Input
-                            id="maintenance"
-                            type="number"
-                            min="0"
-                            value={calculationData.expenses.maintenance}
-                            onChange={(e) => updateExpense('maintenance', Number(e.target.value))}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="utilities">Utilities</Label>
-                        <div className="flex items-center mt-1">
-                          <span className="text-sm mr-2">$</span>
-                          <Input
-                            id="utilities"
-                            type="number"
-                            min="0"
-                            value={calculationData.expenses.utilities}
-                            onChange={(e) => updateExpense('utilities', Number(e.target.value))}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="propertyManagement">Property Management</Label>
-                        <div className="flex items-center mt-1">
-                          <span className="text-sm mr-2">$</span>
-                          <Input
-                            id="propertyManagement"
-                            type="number"
-                            min="0"
-                            value={calculationData.expenses.propertyManagement}
-                            onChange={(e) => updateExpense('propertyManagement', Number(e.target.value))}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="other">Other Expenses</Label>
-                        <div className="flex items-center mt-1">
-                          <span className="text-sm mr-2">$</span>
-                          <Input
-                            id="other"
-                            type="number"
-                            min="0"
-                            value={calculationData.expenses.other}
-                            onChange={(e) => updateExpense('other', Number(e.target.value))}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-muted/30 rounded-lg">
-                    <p className="text-sm font-medium">Total Monthly Expenses</p>
-                    <p className="text-xl font-bold mt-1 text-estate-navy">
-                      {formatCurrency(totalExpenses)}
-                    </p>
-                  </div>
-                  
-                  <div className="p-4 bg-muted/30 rounded-lg">
-                    <p className="text-sm font-medium">Monthly Mortgage</p>
-                    <p className="text-xl font-bold mt-1 text-estate-navy">
-                      {formatCurrency(monthlyMortgagePayment)}
-                    </p>
-                  </div>
                 </div>
               </div>
-            </TabsContent>
+              
+              <div>
+                <Label htmlFor="expenses">Total Monthly Expenses</Label>
+                <div className="flex items-center mt-1">
+                  <span className="text-sm mr-2">$</span>
+                  <Input
+                    id="expenses"
+                    type="number"
+                    min="0"
+                    value={expenses}
+                    onChange={(e) => setExpenses(Number(e.target.value))}
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Include mortgage, taxes, insurance, maintenance, etc.
+                </p>
+              </div>
+            </div>
             
-            <TabsContent value="results" className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium">Monthly Cash Flow</p>
-                  <p className={`text-2xl font-bold mt-1 ${results.monthlyCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(results.monthlyCashFlow)}
-                  </p>
-                </div>
-                
-                <div className="p-4 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium">Annual Cash Flow</p>
-                  <p className={`text-2xl font-bold mt-1 ${results.annualCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(results.annualCashFlow)}
-                  </p>
-                </div>
+            <Button 
+              className="w-full mt-4" 
+              onClick={calculateROI}
+            >
+              Calculate ROI
+            </Button>
+            
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <p className="text-sm font-medium">Monthly Cash Flow</p>
+                <p className={`text-2xl font-bold mt-1 ${results.monthlyCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatCurrency(results.monthlyCashFlow)}
+                </p>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium">Cash on Cash Return</p>
-                  <p className="text-2xl font-bold mt-1 text-estate-navy">
-                    {results.cashOnCashReturn.toFixed(2)}%
-                  </p>
-                </div>
-                
-                <div className="p-4 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium">Cap Rate</p>
-                  <p className="text-2xl font-bold mt-1 text-estate-navy">
-                    {results.capRate.toFixed(2)}%
-                  </p>
-                </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <p className="text-sm font-medium">Annual Cash Flow</p>
+                <p className={`text-2xl font-bold mt-1 ${results.annualCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatCurrency(results.annualCashFlow)}
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <p className="text-sm font-medium">Cash on Cash Return</p>
+                <p className="text-2xl font-bold mt-1 text-estate-navy">
+                  {results.cashOnCashReturn.toFixed(2)}%
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Based on 20% down payment
+                </p>
               </div>
               
-              {results.breakEvenPoint > 0 && (
-                <div className="p-4 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium">Break-Even Point</p>
-                  <p className="text-xl font-bold mt-1 text-estate-navy">
-                    {Math.round(results.breakEvenPoint)} months ({Math.round(results.breakEvenPoint / 12)} years)
-                  </p>
-                </div>
-              )}
-              
-              <div className="mt-6">
-                <h3 className="font-medium mb-4">Monthly Cash Flow Breakdown</h3>
-                <div className="h-60">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={[
-                        {
-                          name: 'Rental Income',
-                          value: calculationData.rentalIncome,
-                          fill: '#10b981' // green-500
-                        },
-                        {
-                          name: 'Expenses',
-                          value: -totalExpenses,
-                          fill: '#f59e0b' // amber-500
-                        },
-                        {
-                          name: 'Mortgage',
-                          value: -monthlyMortgagePayment,
-                          fill: '#ef4444' // red-500
-                        },
-                        {
-                          name: 'Cash Flow',
-                          value: results.monthlyCashFlow,
-                          fill: results.monthlyCashFlow >= 0 ? '#10b981' : '#f43f5e' // green-500 or rose-500
-                        },
-                      ]}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip 
-                        formatter={(value: number) => `$${Math.abs(value).toLocaleString()}`}
-                      />
-                      <Legend />
-                      <Bar dataKey="value" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <p className="text-sm font-medium">Cap Rate</p>
+                <p className="text-2xl font-bold mt-1 text-estate-navy">
+                  {results.capRate.toFixed(2)}%
+                </p>
               </div>
-              
-              <div className="mt-6">
-                <h3 className="font-medium mb-4">Expense Breakdown</h3>
-                <div className="h-60 flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={[
-                          {
-                            name: 'Mortgage',
-                            value: monthlyMortgagePayment,
-                            fill: '#3b82f6' // blue-500
-                          },
-                          {
-                            name: 'Property Tax',
-                            value: calculationData.expenses.propertyTax,
-                            fill: '#f59e0b' // amber-500
-                          },
-                          {
-                            name: 'Insurance',
-                            value: calculationData.expenses.insurance,
-                            fill: '#10b981' // green-500
-                          },
-                          {
-                            name: 'Maintenance',
-                            value: calculationData.expenses.maintenance,
-                            fill: '#ef4444' // red-500
-                          },
-                          {
-                            name: 'Property Mgmt',
-                            value: calculationData.expenses.propertyManagement,
-                            fill: '#8b5cf6' // purple-500
-                          },
-                          {
-                            name: 'Utilities',
-                            value: calculationData.expenses.utilities,
-                            fill: '#0ea5e9' // sky-500
-                          },
-                          {
-                            name: 'Other',
-                            value: calculationData.expenses.other,
-                            fill: '#6b7280' // gray-500
-                          },
-                        ]}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        innerRadius={40}
-                        fill="#8884d8"
-                        dataKey="value"
-                        nameKey="name"
-                      />
-                      <Tooltip 
-                        formatter={(value: number) => `$${value.toLocaleString()}`} 
-                      />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
