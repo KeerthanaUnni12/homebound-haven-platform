@@ -14,6 +14,7 @@ import { Navigate } from 'react-router-dom';
 
 const Profile = () => {
   const { user, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState("profile");
   
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -40,6 +41,10 @@ const Profile = () => {
     });
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -59,23 +64,29 @@ const Profile = () => {
                 <p className="text-muted-foreground capitalize">{user.role}</p>
                 
                 <div className="mt-8 w-full space-y-2">
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <TabsTrigger value="profile" className="w-full justify-start">
-                      <User className="h-4 w-4 mr-2" />
-                      Profile Information
-                    </TabsTrigger>
+                  <Button 
+                    variant="outline" 
+                    className={`w-full justify-start ${activeTab === 'profile' ? 'bg-muted' : ''}`}
+                    onClick={() => handleTabChange('profile')}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Profile Information
                   </Button>
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <TabsTrigger value="security" className="w-full justify-start">
-                      <Key className="h-4 w-4 mr-2" />
-                      Security
-                    </TabsTrigger>
+                  <Button 
+                    variant="outline" 
+                    className={`w-full justify-start ${activeTab === 'security' ? 'bg-muted' : ''}`}
+                    onClick={() => handleTabChange('security')}
+                  >
+                    <Key className="h-4 w-4 mr-2" />
+                    Security
                   </Button>
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <TabsTrigger value="notifications" className="w-full justify-start">
-                      <Bell className="h-4 w-4 mr-2" />
-                      Notifications
-                    </TabsTrigger>
+                  <Button 
+                    variant="outline" 
+                    className={`w-full justify-start ${activeTab === 'notifications' ? 'bg-muted' : ''}`}
+                    onClick={() => handleTabChange('notifications')}
+                  >
+                    <Bell className="h-4 w-4 mr-2" />
+                    Notifications
                   </Button>
                   <Button 
                     variant="outline" 
@@ -91,7 +102,7 @@ const Profile = () => {
           </Card>
           
           <div className="md:col-span-3">
-            <Tabs defaultValue="profile">
+            <Tabs defaultValue="profile" value={activeTab} onValueChange={handleTabChange}>
               <TabsList className="hidden">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="security">Security</TabsTrigger>
