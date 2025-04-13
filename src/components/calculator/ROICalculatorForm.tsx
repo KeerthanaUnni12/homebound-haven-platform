@@ -22,9 +22,9 @@ export const ROICalculatorForm = ({ values, setValues, onCalculate }: ROICalcula
   return (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="propertyValue">Property Value</Label>
+        <Label htmlFor="propertyValue">Property Value (₹)</Label>
         <div className="flex items-center mt-1">
-          <span className="text-sm mr-2">$</span>
+          <span className="text-sm mr-2">₹</span>
           <Input
             id="propertyValue"
             type="number"
@@ -36,9 +36,9 @@ export const ROICalculatorForm = ({ values, setValues, onCalculate }: ROICalcula
       </div>
       
       <div>
-        <Label htmlFor="rentalIncome">Monthly Rental Income</Label>
+        <Label htmlFor="rentalIncome">Monthly Rental Income (₹)</Label>
         <div className="flex items-center mt-1">
-          <span className="text-sm mr-2">$</span>
+          <span className="text-sm mr-2">₹</span>
           <Input
             id="rentalIncome"
             type="number"
@@ -50,9 +50,9 @@ export const ROICalculatorForm = ({ values, setValues, onCalculate }: ROICalcula
       </div>
       
       <div>
-        <Label htmlFor="expenses">Total Monthly Expenses</Label>
+        <Label htmlFor="expenses">Total Monthly Expenses (₹)</Label>
         <div className="flex items-center mt-1">
-          <span className="text-sm mr-2">$</span>
+          <span className="text-sm mr-2">₹</span>
           <Input
             id="expenses"
             type="number"
