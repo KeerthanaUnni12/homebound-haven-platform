@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Property } from '@/types';
 import { toast } from '@/components/ui/use-toast';
@@ -126,7 +125,7 @@ export function PropertyProvider({ children }: { children: React.ReactNode }) {
     setProperties([...properties, newProperty]);
     toast({
       title: 'Property Added',
-      description: 'Your property has been successfully listed',
+      description: 'Your property has been successfully listed on Smart Homi',
     });
   };
   

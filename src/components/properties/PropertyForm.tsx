@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Property } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProperty } from '@/contexts/PropertyContext';
+import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 interface PropertyFormProps {
   initialData?: Partial<Property>;
@@ -24,6 +26,7 @@ interface PropertyFormProps {
 export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFormProps) => {
   const { addProperty, updateProperty } = useProperty();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     title: initialData.title || '',
@@ -38,6 +41,7 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
     images: initialData.images || ['/placeholder.svg'],
   });
   
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -58,6 +62,29 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
     }));
   };
   
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    const newImages: string[] = [];
+    
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        newImages.push(base64String);
+        
+        // Update uploadedImages when a new image is processed
+        setUploadedImages(prev => [...prev, base64String]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+  
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -68,20 +95,39 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
         .map(feature => feature.trim())
         .filter(feature => feature !== '');
       
+      // Use the uploaded images or placeholders if none
+      const imagesToUse = uploadedImages.length > 0 
+        ? uploadedImages 
+        : ['/placeholder.svg'];
+      
       const propertyData = {
         ...formData,
         features: featuresArray,
+        images: imagesToUse,
       };
       
       if (isEditing && initialData.id) {
         await updateProperty({ id: initialData.id, ...propertyData } as Property);
+        toast({
+          title: "Success",
+          description: "Property updated successfully",
+        });
         navigate(`/properties/${initialData.id}`);
       } else {
         await addProperty(propertyData as any);
+        toast({
+          title: "Success",
+          description: "Property listed successfully",
+        });
         navigate('/my-properties');
       }
     } catch (error) {
       console.error('Failed to save property:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save property",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -96,7 +142,7 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
         <CardDescription>
           {isEditing 
             ? 'Update the details of your property listing.'
-            : 'Fill out the form below to list your property on Homestead Haven.'}
+            : 'Fill out the form below to list your property on Smart Homi.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -224,15 +270,64 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
             
             <div className="space-y-2 md:col-span-2">
               <Label>Images</Label>
-              <div className="flex items-center space-x-2">
-                <div className="border border-dashed border-gray-300 rounded-lg p-4 text-center flex-1">
-                  <p className="text-muted-foreground text-sm mb-2">
-                    We're using placeholder images for this demo.
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    In a real application, you would be able to upload images here.
-                  </p>
-                </div>
+              <div className="border border-dashed border-gray-300 rounded-lg p-6">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                
+                {uploadedImages.length > 0 ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {uploadedImages.map((img, index) => (
+                        <div key={index} className="relative aspect-video rounded-md overflow-hidden border border-gray-200 group">
+                          <img 
+                            src={img} 
+                            alt={`Property image ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-2 right-2 p-1 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Add More Images
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <ImageIcon className="mx-auto h-12 w-12 text-gray-300" />
+                    <div className="mt-4 flex flex-col items-center">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Images
+                      </Button>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        JPG, PNG, GIF up to 10MB
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
