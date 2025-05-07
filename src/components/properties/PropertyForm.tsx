@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Property } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,14 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
   
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  
+  useEffect(() => {
+    // Initialize preview images with existing images when editing
+    if (initialData.images && initialData.images.length > 0 && initialData.images[0] !== '/placeholder.svg') {
+      setPreviewImages([...initialData.images]);
+    }
+  }, [initialData.images]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -66,22 +74,48 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
     const files = e.target.files;
     if (!files || files.length === 0) return;
     
-    const newImages: string[] = [];
+    const maxFileSizeMB = 5; // 5MB max file size
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     
     Array.from(files).forEach(file => {
+      // Validate file type
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Invalid File Type",
+          description: `${file.name} is not a supported image format. Please use JPG, PNG, GIF, or WebP.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate file size
+      if (file.size > maxFileSizeMB * 1024 * 1024) {
+        toast({
+          title: "File Too Large",
+          description: `${file.name} exceeds the ${maxFileSizeMB}MB limit.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
-        newImages.push(base64String);
-        
-        // Update uploadedImages when a new image is processed
+        // Update both uploadedImages (for form submission) and previewImages (for UI)
         setUploadedImages(prev => [...prev, base64String]);
+        setPreviewImages(prev => [...prev, base64String]);
       };
       reader.readAsDataURL(file);
     });
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
   
   const removeImage = (index: number) => {
+    setPreviewImages(prev => prev.filter((_, i) => i !== index));
     setUploadedImages(prev => prev.filter((_, i) => i !== index));
   };
   
@@ -96,8 +130,8 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
         .filter(feature => feature !== '');
       
       // Use the uploaded images or placeholders if none
-      const imagesToUse = uploadedImages.length > 0 
-        ? uploadedImages 
+      const imagesToUse = previewImages.length > 0 
+        ? previewImages 
         : ['/placeholder.svg'];
       
       const propertyData = {
@@ -270,60 +304,72 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
             
             <div className="space-y-2 md:col-span-2">
               <Label>Images</Label>
-              <div className="border border-dashed border-gray-300 rounded-lg p-6">
+              <div className="border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg, image/png, image/gif, image/webp"
                   multiple
                   onChange={handleImageUpload}
                   className="hidden"
                 />
                 
-                {uploadedImages.length > 0 ? (
+                {previewImages.length > 0 ? (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      {uploadedImages.map((img, index) => (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {previewImages.map((img, index) => (
                         <div key={index} className="relative aspect-video rounded-md overflow-hidden border border-gray-200 group">
                           <img 
                             src={img} 
                             alt={`Property image ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute top-2 right-2 p-1 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors">
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute top-2 right-2 p-1 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Add More Images
-                    </Button>
+                    <div className="flex justify-center">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full max-w-xs"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Add More Images
+                      </Button>
+                    </div>
+                    <p className="text-xs text-center text-muted-foreground">
+                      Max 5MB per image. JPG, PNG, GIF, WebP formats supported.
+                    </p>
                   </div>
                 ) : (
-                  <div className="text-center">
-                    <ImageIcon className="mx-auto h-12 w-12 text-gray-300" />
+                  <div className="text-center py-8">
+                    <ImageIcon className="mx-auto h-16 w-16 text-gray-300" />
                     <div className="mt-4 flex flex-col items-center">
+                      <h3 className="text-sm font-medium text-gray-900">Upload Property Images</h3>
+                      <p className="mt-1 text-xs text-gray-500">
+                        Drag and drop or click to upload
+                      </p>
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() => fileInputRef.current?.click()}
+                        className="mt-4"
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        Upload Images
+                        Select Images
                       </Button>
                       <p className="mt-2 text-xs text-muted-foreground">
-                        JPG, PNG, GIF up to 10MB
+                        Max 5MB per image. JPG, PNG, GIF, WebP formats supported.
                       </p>
                     </div>
                   </div>

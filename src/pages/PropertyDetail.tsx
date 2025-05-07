@@ -13,6 +13,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { MapPin, Bed, Bath, Square, Calendar, User, Edit, Trash2, Home, Upload } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/use-toast';
+import { useForm } from 'react-hook-form';
+
+interface ContactFormValues {
+  name: string;
+  email: string;
+  message: string;
+}
 
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,8 +32,17 @@ const PropertyDetail = () => {
   const { getPropertyById, deleteProperty } = useProperty();
   const { user } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   
   const property = getPropertyById(id || '');
+  
+  const form = useForm<ContactFormValues>({
+    defaultValues: {
+      name: user?.name || '',
+      email: user?.email || '',
+      message: `I'm interested in this property (${property?.title || 'Property'}) and would like more information.`
+    }
+  });
   
   if (!property) {
     return (
@@ -45,6 +66,15 @@ const PropertyDetail = () => {
   const handleDeleteProperty = () => {
     deleteProperty(property.id);
     navigate('/properties');
+  };
+
+  const onSubmitRequest = (data: ContactFormValues) => {
+    console.log('Contact form submitted:', data);
+    toast({
+      title: "Request Sent",
+      description: "We've received your inquiry and will be in touch soon.",
+    });
+    setIsPopoverOpen(false);
   };
 
   return (
@@ -214,8 +244,61 @@ const PropertyDetail = () => {
             <div className="bg-white border rounded-lg p-6 shadow-sm">
               <h3 className="font-semibold text-lg mb-4">Interested in this property?</h3>
               <div className="space-y-4">
-                <Button className="w-full">Schedule a Visit</Button>
-                <Button variant="outline" className="w-full">Request Information</Button>
+                <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button className="w-full">Request Information</Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-sm">Contact about this property</h4>
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmitRequest)} className="space-y-4">
+                          <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Your name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Your email" type="email" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="message"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Message</FormLabel>
+                                <FormControl>
+                                  <Textarea placeholder="Your message" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button type="submit" className="w-full">Send Request</Button>
+                        </form>
+                      </Form>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                
                 <Button variant="secondary" className="w-full">
                   <Link to="/calculator" className="flex w-full justify-center">
                     Calculate ROI
