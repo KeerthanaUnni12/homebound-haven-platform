@@ -1,9 +1,10 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Property } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from './AuthContext';
 
-// Mock property data with Indian locations
+// Mock property data with Indian locations and real images
 const mockProperties: Property[] = [
   {
     id: '1',
@@ -14,7 +15,10 @@ const mockProperties: Property[] = [
     bedrooms: 2,
     bathrooms: 2,
     squareFootage: 1200,
-    images: ['/placeholder.svg', '/placeholder.svg'],
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688'
+    ],
     features: ['Balcony', 'Hardwood Floors', 'Stainless Steel Appliances'],
     sellerId: '123',
     sellerName: 'John Doe',
@@ -31,7 +35,10 @@ const mockProperties: Property[] = [
     bedrooms: 4,
     bathrooms: 3,
     squareFootage: 2400,
-    images: ['/placeholder.svg', '/placeholder.svg'],
+    images: [
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6',
+      'https://images.unsplash.com/photo-1576941089067-2de3c901e126'
+    ],
     features: ['Swimming Pool', 'Garage', 'Garden'],
     sellerId: '456',
     sellerName: 'Jane Smith',
@@ -48,7 +55,10 @@ const mockProperties: Property[] = [
     bedrooms: 5,
     bathrooms: 4,
     squareFootage: 3500,
-    images: ['/placeholder.svg', '/placeholder.svg'],
+    images: [
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750'
+    ],
     features: ['Beach Access', 'Swimming Pool', 'Home Theater', 'Wine Cellar'],
     sellerId: '789',
     sellerName: 'Robert Johnson',
@@ -65,7 +75,10 @@ const mockProperties: Property[] = [
     bedrooms: 1,
     bathrooms: 2,
     squareFootage: 1100,
-    images: ['/placeholder.svg', '/placeholder.svg'],
+    images: [
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
+      'https://images.unsplash.com/photo-1554995207-c18c203602cb'
+    ],
     features: ['High Ceilings', 'Exposed Brick', 'Open Layout'],
     sellerId: '101',
     sellerName: 'Emily Wilson',
