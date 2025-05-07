@@ -21,16 +21,16 @@ const Login = () => {
               </Link>
             </p>
           </div>
-          <div className="hidden lg:block rounded-lg overflow-hidden shadow-xl">
+          <div className="hidden lg:block rounded-lg overflow-hidden shadow-xl relative">
             <img 
-              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" 
-              alt="Modern real estate workspace" 
+              src="https://images.unsplash.com/photo-1459767129954-1b1c1f9b9ace" 
+              alt="Modern luxury real estate property" 
               className="w-full h-full object-cover"
-              style={{ height: "500px" }}
+              style={{ height: "600px" }}
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-estate-navy/80 to-transparent p-6">
-              <h3 className="text-white text-xl font-medium">Smart Real Estate Solutions</h3>
-              <p className="text-white/80 mt-2">Simplifying your property journey</p>
+              <h3 className="text-white text-xl font-medium">Discover Your Dream Home</h3>
+              <p className="text-white/80 mt-2">Premium properties waiting for you</p>
             </div>
           </div>
         </div>

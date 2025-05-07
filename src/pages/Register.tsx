@@ -24,14 +24,14 @@ const Register = () => {
           </div>
           <div className="hidden lg:block rounded-lg overflow-hidden shadow-xl relative">
             <img 
-              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" 
-              alt="Modern technology workspace" 
+              src="https://images.unsplash.com/photo-1496307653780-42ee777d4833" 
+              alt="Modern architectural real estate" 
               className="w-full h-full object-cover"
-              style={{ height: "500px" }}
+              style={{ height: "600px" }}
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-estate-navy/80 to-transparent p-6">
-              <h3 className="text-white text-xl font-medium">Join our community</h3>
-              <p className="text-white/80 mt-2">Access exclusive property listings and tools</p>
+              <h3 className="text-white text-xl font-medium">Your Real Estate Journey Begins Here</h3>
+              <p className="text-white/80 mt-2">Find exclusive properties and investment opportunities</p>
             </div>
           </div>
         </div>
