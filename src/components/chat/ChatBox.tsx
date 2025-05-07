@@ -46,20 +46,14 @@ export const ChatBox = () => {
             <Bot className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium">How can I help you today?</h3>
             <p className="text-muted-foreground mt-2">
-              Ask me about properties, investment advice, or any real estate questions you have.
+              Ask me about properties or any real estate questions you have.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-6 w-full max-w-md">
               <Button variant="outline" className="justify-start" onClick={() => sendMessage("How much house can I afford?")}>
                 How much house can I afford?
               </Button>
               <Button variant="outline" className="justify-start" onClick={() => sendMessage("What's a good location to invest?")}>
-                What's a good location to invest?
-              </Button>
-              <Button variant="outline" className="justify-start" onClick={() => sendMessage("How do I upload documents?")}>
-                How do I upload documents?
-              </Button>
-              <Button variant="outline" className="justify-start" onClick={() => sendMessage("Calculate ROI for a rental property")}>
-                Calculate ROI for a rental
+                Best locations to invest?
               </Button>
             </div>
           </div>
@@ -86,10 +80,7 @@ export const ChatBox = () => {
                       <Bot className="h-4 w-4 mr-1" />
                     )}
                     <span className="text-xs opacity-70">
-                      {msg.sender === 'user' ? 'You' : 'Assistant'} • {new Date(msg.timestamp).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {msg.sender === 'user' ? 'You' : 'Assistant'}
                     </span>
                   </div>
                   <p className="text-sm whitespace-pre-wrap">{msg.message}</p>

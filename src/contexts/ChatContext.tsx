@@ -17,60 +17,40 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
 
-  // Simple bot responses based on user role and message content
+  // Simplified bot response generator
   const generateBotResponse = (message: string, role: UserRole = 'guest') => {
     setIsLoading(true);
     
-    const buyerResponses = [
-      "Here are some properties that match your criteria. Would you like to schedule a viewing?",
-      "Have you considered looking in neighboring areas? They often offer better value.",
-      "I can help you calculate mortgage payments for this property. Would you like to see an estimate?",
-      "This property has been on the market for 2 weeks. The seller might be open to negotiation.",
-      "Based on your preferences, I recommend exploring properties in the 300K-400K range."
-    ];
-    
-    const sellerResponses = [
-      "Your listing is getting good traction! 15 users have saved it in the last 24 hours.",
-      "Professional photography can increase interest in your property by up to 30%.",
-      "Based on market trends, your asking price is competitive for your area.",
-      "Would you like tips on preparing your home for viewings?",
-      "Similar properties in your area are selling within 3 weeks of listing."
-    ];
-    
-    const generalResponses = [
-      "How else can I assist you with your real estate needs?",
-      "Feel free to ask any questions about our services or the real estate market.",
-      "I'm here to help make your real estate journey easier!",
-      "Is there anything specific you'd like to know about the real estate process?",
-      "Would you like me to connect you with one of our real estate professionals?"
-    ];
-    
-    // Choose response pool based on user role
-    const responsePool = role === 'buyer' ? buyerResponses 
-      : role === 'seller' ? sellerResponses 
-      : generalResponses;
-    
-    // Simple keyword matching for more relevant responses
+    // Simplified response logic with less repetitive answers
     const lowerMessage = message.toLowerCase();
     let response = "";
     
-    if (lowerMessage.includes("price") || lowerMessage.includes("cost") || lowerMessage.includes("expensive")) {
+    if (lowerMessage.includes("price") || lowerMessage.includes("cost")) {
       response = "Property prices vary based on location, size, and features. What's your budget range?";
-    } else if (lowerMessage.includes("location") || lowerMessage.includes("area") || lowerMessage.includes("where")) {
+    } else if (lowerMessage.includes("location") || lowerMessage.includes("area")) {
       response = "We have properties in various locations. Any particular area you're interested in?";
-    } else if (lowerMessage.includes("mortgage") || lowerMessage.includes("loan") || lowerMessage.includes("finance")) {
-      response = "Our ROI calculator can help estimate mortgage payments and investment returns. Would you like to try it?";
-    } else if (lowerMessage.includes("document") || lowerMessage.includes("upload") || lowerMessage.includes("file")) {
-      response = "You can securely upload and manage your documents in the Documents section. All files are encrypted.";
-    } else if (lowerMessage.includes("sell") || lowerMessage.includes("selling") || lowerMessage.includes("list")) {
-      response = "To list your property, go to the 'Add Property' section and complete the details. Would you like more information?";
+    } else if (lowerMessage.includes("mortgage") || lowerMessage.includes("loan")) {
+      response = "Our calculator can help estimate mortgage payments. Would you like to try it?";
+    } else if (lowerMessage.includes("document") || lowerMessage.includes("upload")) {
+      response = "You can securely upload and manage your documents in the Documents section.";
+    } else if (lowerMessage.includes("sell") || lowerMessage.includes("selling")) {
+      response = "To list your property, go to the 'Add Property' section and complete the details.";
     } else {
-      // Random response if no keywords match
-      const randomIndex = Math.floor(Math.random() * responsePool.length);
-      response = responsePool[randomIndex];
+      // More varied general responses
+      const generalResponses = [
+        "How else can I assist you today?",
+        "Is there anything specific about real estate you'd like to know?",
+        "I'm here to help with your property questions.",
+        "Would you like information about buying or selling properties?",
+        "Can I help you find your dream home?"
+      ];
+      
+      // Use a more random selection method
+      const randomIndex = Math.floor(Math.random() * generalResponses.length);
+      response = generalResponses[randomIndex];
     }
     
-    // Simulate network delay
+    // Simulate network delay (shorter for better UX)
     setTimeout(() => {
       const botMessage: ChatMessage = {
         id: Math.random().toString(36).substring(2, 9),
@@ -81,7 +61,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       
       setMessages(prevMessages => [...prevMessages, botMessage]);
       setIsLoading(false);
-    }, 1000);
+    }, 800);
   };
 
   const sendMessage = (message: string) => {
