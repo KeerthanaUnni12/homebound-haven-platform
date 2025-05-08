@@ -33,6 +33,7 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
     description: initialData.description || '',
     price: initialData.price || 0,
     location: initialData.location || '',
+    address: initialData.address || '',
     bedrooms: initialData.bedrooms || 1,
     bathrooms: initialData.bathrooms || 1,
     squareFootage: initialData.squareFootage || 0,
@@ -240,13 +241,25 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">City, State</Label>
               <Input
                 id="location"
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                placeholder="City, State"
+                placeholder="Mumbai, Maharashtra"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="address">Complete Address</Label>
+              <Textarea
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="123 Street Name, Locality, City, State, PIN Code"
                 required
               />
             </div>

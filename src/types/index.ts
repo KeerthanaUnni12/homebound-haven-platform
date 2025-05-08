@@ -1,3 +1,4 @@
+
 // User related types
 export type UserRole = 'buyer' | 'seller' | 'guest';
 
@@ -15,7 +16,8 @@ export interface Property {
   title: string;
   description: string;
   price: number;
-  location: string;
+  location: string; // Keeping this for backward compatibility
+  address: string; // New field for detailed address
   bedrooms: number;
   bathrooms: number;
   squareFootage: number;

@@ -151,6 +151,13 @@ const PropertyDetail = () => {
                         {property.description}
                       </p>
                     </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Address</h3>
+                      <p className="text-muted-foreground">
+                        {property.address || 'No detailed address provided'}
+                      </p>
+                    </div>
                     
                     <div>
                       <h3 className="text-lg font-semibold mb-2">Property Details</h3>
@@ -356,7 +363,7 @@ const PropertyDetail = () => {
                 <span className="text-muted-foreground ml-2">Map would be displayed here</span>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                {property.location}
+                {property.address}
               </p>
             </div>
           </div>
