@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -357,12 +356,8 @@ const PropertyDetail = () => {
             )}
             
             <div className="bg-estate-lightblue border rounded-lg p-6">
-              <h3 className="font-semibold text-lg mb-4">Property Location</h3>
-              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                <MapPin className="h-10 w-10 text-estate-navy" />
-                <span className="text-muted-foreground ml-2">Map would be displayed here</span>
-              </div>
-              <p className="mt-4 text-sm text-muted-foreground">
+              <h3 className="font-semibold text-lg mb-4">Property Address</h3>
+              <p className="text-muted-foreground">
                 {property.address}
               </p>
             </div>
