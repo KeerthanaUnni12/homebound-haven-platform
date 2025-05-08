@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Property } from '@/types';
 import { toast } from '@/components/ui/use-toast';
@@ -11,7 +10,6 @@ const mockProperties: Property[] = [
     title: 'Modern Downtown Apartment',
     description: 'A beautiful modern apartment in the heart of downtown with amazing city views.',
     price: 5500000,
-    location: 'Mumbai, Maharashtra',
     address: '123 Seashore Tower, Marine Drive, Mumbai, Maharashtra 400001',
     bedrooms: 2,
     bathrooms: 2,
@@ -32,7 +30,6 @@ const mockProperties: Property[] = [
     title: 'Suburban Family Home',
     description: 'Spacious family home in a quiet suburban neighborhood with a large backyard.',
     price: 8500000,
-    location: 'Bangalore, Karnataka',
     address: '45 Green Valley Layout, Whitefield, Bangalore, Karnataka 560066',
     bedrooms: 4,
     bathrooms: 3,
@@ -53,7 +50,6 @@ const mockProperties: Property[] = [
     title: 'Luxury Beachfront Villa',
     description: 'Stunning beachfront villa with panoramic ocean views and private access to the beach.',
     price: 22000000,
-    location: 'Goa, India',
     address: 'Villa 7, Sunset Beach Road, Calangute, North Goa, Goa 403516',
     bedrooms: 5,
     bathrooms: 4,
@@ -74,7 +70,6 @@ const mockProperties: Property[] = [
     title: 'Urban Loft Apartment',
     description: 'Stylish loft apartment in a converted industrial building with original features.',
     price: 6250000,
-    location: 'Delhi, India',
     address: '302 Heritage Lofts, Connaught Place, New Delhi, Delhi 110001',
     bedrooms: 1,
     bathrooms: 2,
@@ -173,9 +168,9 @@ export function PropertyProvider({ children }: { children: React.ReactNode }) {
   const searchProperties = (filters: any) => {
     let filtered = [...properties];
     
-    if (filters.location) {
+    if (filters.address) {
       filtered = filtered.filter(property => 
-        property.location.toLowerCase().includes(filters.location.toLowerCase())
+        property.address.toLowerCase().includes(filters.address.toLowerCase())
       );
     }
     

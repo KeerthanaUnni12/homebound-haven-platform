@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Property } from '@/types';
@@ -32,7 +31,6 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
     title: initialData.title || '',
     description: initialData.description || '',
     price: initialData.price || 0,
-    location: initialData.location || '',
     address: initialData.address || '',
     bedrooms: initialData.bedrooms || 1,
     bathrooms: initialData.bathrooms || 1,
@@ -236,18 +234,6 @@ export const PropertyForm = ({ initialData = {}, isEditing = false }: PropertyFo
                 onChange={handleChange}
                 placeholder="5000000"
                 min={0}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="location">City, State</Label>
-              <Input
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                placeholder="Mumbai, Maharashtra"
                 required
               />
             </div>

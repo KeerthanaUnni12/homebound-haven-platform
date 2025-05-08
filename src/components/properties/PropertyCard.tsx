@@ -58,7 +58,7 @@ export const PropertyCard = ({ property }: PropertyCardProps) => {
           <h3 className="font-semibold text-lg truncate">{property.title}</h3>
           <div className="flex items-center text-muted-foreground text-sm">
             <MapPin className="w-3 h-3 mr-1" />
-            <span className="truncate">{property.location}</span>
+            <span className="truncate">{property.address.split(',')[0]}</span>
           </div>
         </div>
         <div className="text-xl font-bold text-estate-navy mb-2">
