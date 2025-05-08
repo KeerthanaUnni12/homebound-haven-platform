@@ -90,7 +90,7 @@ const PropertyDetail = () => {
               <h1 className="text-3xl font-bold">{property.title}</h1>
               <div className="flex items-center mt-2 text-muted-foreground">
                 <MapPin className="h-4 w-4 mr-1" />
-                <span>{property.location}</span>
+                <span>{property.address}</span>
               </div>
             </div>
             
